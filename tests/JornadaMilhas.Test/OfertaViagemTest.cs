@@ -10,11 +10,24 @@ namespace JornadaMilhas.Test
             Rota rota = new Rota("OrigemTeste", "DestinoTeste");
             Periodo periodo = new Periodo(new DateTime(2024, 2, 1), new DateTime(2024, 2, 5));
             double preco = 100.0;
-            var validacao = true;
 
             OfertaViagem oferta = new OfertaViagem(rota, periodo, preco);
 
-            Assert.Equal(validacao, oferta.EhValido);
+            Assert.True(oferta.EhValido);
+        }
+
+        [Fact]
+        public void QuandoPrecoEhZeroTeste()
+        {
+            Rota rota = new Rota("OrigemTeste", "DestinoTeste");
+            Periodo periodo = new Periodo(new DateTime(2024, 3, 15), new DateTime(2024, 3, 28));
+            double preco = 0;
+            var msgError = "O preço da oferta de viagem deve ser maior que zero.";
+
+            OfertaViagem oferta = new OfertaViagem(rota, periodo, preco);
+
+            Assert.False(oferta.EhValido);
+            Assert.Contains(msgError, oferta.Erros.Sumario);
         }
 
         [Fact]
