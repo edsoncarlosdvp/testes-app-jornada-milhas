@@ -4,29 +4,33 @@ namespace JornadaMilhas.Test
 {
     public class OfertaViagemConstrutor
     {
-        [Fact]
-        public void RetornaOfertaValidaQuandoDadosSaoValidos()
+        [Theory]
+        [InlineData("", null, "2024-02-01", "2024-02-05", 0, false)]
+        [InlineData(null, "DestinoTeste", "2024-02-01", "2024-02-05", -1, false)]
+        [InlineData("OrigemTeste", "DestinoTeste", "2024-02-01", "2024-02-05", 100, true)]
+        [InlineData("OrigemTeste", "DestinoTeste", "2024-02-01", "2024-02-05", -1, false)]
+
+        public void RetornaEhValidoDeAcordoComEntrada(string origem, string destino, string dataIda, string dataVolta, double preco, bool validacao)
         {
-            Rota rota = new Rota("OrigemTeste", "DestinoTeste");
-            Periodo periodo = new Periodo(new DateTime(2024, 2, 1), new DateTime(2024, 2, 5));
-            double preco = 100.0;
+            Rota rota = new Rota(origem, destino);
+            Periodo periodo = new Periodo(DateTime.Parse(dataIda), DateTime.Parse(dataVolta));
 
             OfertaViagem oferta = new OfertaViagem(rota, periodo, preco);
 
-            Assert.True(oferta.EhValido);
+            Assert.Equal(validacao, oferta.EhValido);
         }
 
-        [Fact]
-        public void RetornaUmaMensagemDeErroQuandoPrecoEhZero()
+        [Theory]
+        [InlineData("OrigemTeste", "DestinoTeste", "2024-02-01", "2024-02-05", 0, "O preço da oferta de viagem deve ser maior que zero.", false)]
+        [InlineData("OrigemTeste", "DestinoTeste", "2024-02-01", "2024-02-05", -1, "O preço da oferta de viagem deve ser maior que zero.", false)]
+        public void RetornaUmaMensagemDeErroQuandoPrecoEhInvalido(string origem, string destino, string dataIda, string dataVolta, double preco, string msgError, bool validacao)
         {
-            Rota rota = new Rota("OrigemTeste", "DestinoTeste");
-            Periodo periodo = new Periodo(new DateTime(2024, 3, 15), new DateTime(2024, 3, 28));
-            double preco = 0;
-            var msgError = "O preço da oferta de viagem deve ser maior que zero.";
+            Rota rota = new Rota(origem, destino);
+            Periodo periodo = new Periodo(DateTime.Parse(dataIda), DateTime.Parse(dataVolta));
 
             OfertaViagem oferta = new OfertaViagem(rota, periodo, preco);
 
-            Assert.False(oferta.EhValido);
+            Assert.False(validacao);
             Assert.Contains(msgError, oferta.Erros.Sumario);
         }
 
